@@ -1,0 +1,27 @@
+---
+spring.config.activate.on-profile: local
+spring:
+  data:
+    redis:
+      host: ${STORAGE_REDIS_HOST}
+      port: ${STORAGE_REDIS_PORT}
+      password: ${STORAGE_REDIS_PASSWORD}
+
+---
+spring.config.activate.on-profile: dev
+spring:
+  data:
+    redis:
+      host: ${STORAGE_REDIS_HOST}
+      port: ${STORAGE_REDIS_PORT}
+      password: ${STORAGE_REDIS_PASSWORD}
+
+
+---
+spring.config.activate.on-profile: live
+spring:
+  data:
+    redis:
+      host: ${STORAGE_REDIS_HOST}
+      port: ${STORAGE_REDIS_PORT}
+      password: ${STORAGE_REDIS_PASSWORD}

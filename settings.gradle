@@ -1,0 +1,9 @@
+rootProject.name = 'greenlight'
+include 'storage'
+include 'core:core-api'
+include 'core:core-enum'
+findProject(':core:core-api')?.name = 'core-api'
+findProject(':core:core-enum')?.name = 'core-enum'
+include 'storage:db-core'
+findProject(':storage:db-core')?.name = 'db-core'
+
