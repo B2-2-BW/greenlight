@@ -1,9 +1,11 @@
 package com.winten.greenlight.core.support.util;
 
 import com.github.f4b6a3.tsid.TsidCreator;
+import org.springframework.stereotype.Component;
 
+@Component
 public class TSIDGenerator {
-    public static long tsid() {
-        return TsidCreator.getTsid().toLong();
+    public String generate() {
+        return TsidCreator.getTsid().toString();
     }
 }

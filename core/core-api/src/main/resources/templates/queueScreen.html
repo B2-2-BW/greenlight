@@ -6,9 +6,47 @@
 </head>
 <body>
 <h1>Welcome to the Queue Screen!</h1>
-<p>Name: <span th:text="${customer.key}"></span></p>
-<p>Age: <span th:text="${customer.value}"></span></p>
-<p>score: <span th:text="${customer.score}"></span></p>
-<p>등수: <span th:text="${customer.rank}"></span></p>
+<p>eventId: <span th:text="${customer.eventId}"></span></p>
+<p>customerId: <span th:text="${customer.customerId}"></span></p>
+<p id="position">position: <span></span></p>
+<p id="entryTicket">entryTicket: <span></span></p>
+
 </body>
+<script th:inline="javascript">
+    const url = 'http://localhost:8080/q/poll';
+    const data = {
+        eventId: /*[[${customer.eventId}]]*/ '',
+        customerId: /*[[${customer.customerId}]]*/ ''
+    };
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    };
+    function fetchWaitingNumber() {
+        fetch(url, options)
+            .then(response => response.json())
+            .then(data => {
+                if (data?.result === 'ERROR') {
+                    alert("error " + data?.error?.message)
+                    clearInterval(intervalId)
+                    return
+                }
+                if (data.entryTicket) {
+                   let newUrl = '/e/test?entryTicket=' + data.entryTicket
+                    window.open(newUrl, "_top")
+                }
+                document.getElementById('position').innerText = 'position: ' + data.position
+                document.getElementById('entryTicket').innerText = 'entryTicket: ' + data.entryTicket
+            })
+            .catch(error => {
+                console.error('에러:', error)
+                alert("error " + error?.error?.message)
+                clearInterval(intervalId)
+            });
+    }
+    let intervalId = setInterval(fetchWaitingNumber, 5000);
+</script>
 </html>

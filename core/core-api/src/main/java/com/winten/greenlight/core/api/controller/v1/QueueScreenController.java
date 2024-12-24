@@ -1,28 +1,47 @@
 package com.winten.greenlight.core.api.controller.v1;
 
-import com.winten.greenlight.core.domain.queue.ReactiveQueueManager;
+import com.winten.greenlight.core.domain.ConfigService;
+import com.winten.greenlight.core.domain.QueueService;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import reactor.core.publisher.Mono;
 
-@Controller
-@RequestMapping("/event")
-public class QueueScreenController {
-    private final ReactiveQueueManager queueManager;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
-    public QueueScreenController(ReactiveQueueManager queueManager) {
-        this.queueManager = queueManager;
+@Controller
+@RequestMapping("/e")
+@RequiredArgsConstructor
+public class QueueScreenController {
+    private final QueueService queueService;
+    private final ConfigService configService;
+
+    @GetMapping("/{eventId}")
+    public Mono<String> getQueueScreen(@PathVariable String eventId, Model model) {
+        return configService.getEventUrlMap()
+                        .flatMap(urlMap -> {
+                            if (urlMap.containsKey(eventId)) {
+                                return queueService.registerCustomerInWaitingQueue(eventId)
+                                        .flatMap(customer -> {
+                                            model.addAttribute("customer", customer);
+                                            return Mono.just("queueScreen");
+                                        });
+                            }
+                            else {
+                                return Mono.just("notFound");
+                            }
+                        });
     }
 
-    @GetMapping("/queue")
-    public Mono<String> getQueueScreen(Model model) {
-        return queueManager.getQueuedCustomer()
-                        .flatMap(queuedCustomer -> {
-                            model.addAttribute("customer", queuedCustomer);
-                            return Mono.just("queueScreen");
-                        });
+    @GetMapping("/test")
+    public Mono<String> getTestPage(@RequestParam String entryTicket, Model model) {
+        model.addAttribute("entryTicket", URLDecoder.decode(entryTicket, StandardCharsets.UTF_8));
+        return Mono.just("testPage");
     }
 }

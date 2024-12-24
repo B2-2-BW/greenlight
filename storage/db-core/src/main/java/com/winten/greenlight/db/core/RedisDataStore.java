@@ -1,6 +1,9 @@
 package com.winten.greenlight.db.core;
 
+import org.springframework.data.domain.Range;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class RedisDataStore {
@@ -20,5 +23,9 @@ public class RedisDataStore {
 
     public Mono<Long> rank(String key, String value) {
         return redisTemplate.opsForZSet().rank(key, value);
+    }
+
+    public Flux<ZSetOperations.TypedTuple<String>> rangeFirst(String key, long count) {
+        return redisTemplate.opsForZSet().rangeWithScores(key, Range.closed(0L, count));
     }
 }
