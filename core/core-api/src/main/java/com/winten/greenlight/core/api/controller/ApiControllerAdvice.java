@@ -1,8 +1,8 @@
 package com.winten.greenlight.core.api.controller;
 
-import com.winten.greenlight.core.support.error.CoreException;
-import com.winten.greenlight.core.support.error.ErrorType;
 import com.winten.greenlight.core.support.response.ApiResponse;
+import com.winten.greenlight.support.error.CoreException;
+import com.winten.greenlight.support.error.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class ApiControllerAdvice {
         return new ResponseEntity<>(ApiResponse.error(e.getErrorType(), e.getData()), e.getErrorType().getStatus());
     }
 
-    @ExceptionHandler(Exception.class)
+//    @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<?>> handleException(Exception e) {
         log.error("Exception : {}", e.getMessage(), e);
         return new ResponseEntity<>(ApiResponse.error(ErrorType.DEFAULT_ERROR), ErrorType.DEFAULT_ERROR.getStatus());

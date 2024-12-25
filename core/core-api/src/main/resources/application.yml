@@ -5,6 +5,7 @@ spring:
   config:
     import:
       - storage.yml
+      - logging.yml
   web.resources.add-mappings: false
 
 server:
@@ -13,7 +14,14 @@ server:
     threads:
       max: 600
       min-spare: 100
+  error:
+    include-message: always
 
+logging:
+  level:
+    root: INFO
+    com.winten: DEBUG
+    org.springframework.data.redis: DEBUG
 ---
 spring.config.activate.on-profile: local
 

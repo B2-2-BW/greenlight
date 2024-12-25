@@ -6,4 +6,8 @@ findProject(':core:core-api')?.name = 'core-api'
 findProject(':core:core-enum')?.name = 'core-enum'
 include 'storage:db-core'
 findProject(':storage:db-core')?.name = 'db-core'
+include 'support'
+include 'support:logging'
+findProject(':support:logging')?.name = 'logging'
+include 'domain'
 

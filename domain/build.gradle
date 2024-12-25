@@ -1,0 +1,9 @@
+dependencies {
+    implementation project(":core:core-enum")
+    implementation project(":support:logging")
+    compileOnly("org.springframework:spring-context")
+    compileOnly("org.springframework:spring-web")
+    implementation 'io.projectreactor:reactor-core'
+    implementation 'jakarta.annotation:jakarta.annotation-api:3.0.0'
+    implementation group: 'com.github.f4b6a3', name: 'tsid-creator', version: '5.2.6'
+}

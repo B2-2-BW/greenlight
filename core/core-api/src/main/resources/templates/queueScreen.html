@@ -6,17 +6,17 @@
 </head>
 <body>
 <h1>Welcome to the Queue Screen!</h1>
-<p>eventId: <span th:text="${customer.eventId}"></span></p>
-<p>customerId: <span th:text="${customer.customerId}"></span></p>
+<p>eventId: <span th:text="${guest.eventId}"></span></p>
+<p>customerId: <span th:text="${guest.customerId}"></span></p>
 <p id="position">position: <span></span></p>
-<p id="entryTicket">entryTicket: <span></span></p>
+<p id="size">size: <span></span></p>
+<p id="estimatedWaitingTime">estimatedWaitingTime: <span></span></p>
 
 </body>
 <script th:inline="javascript">
-    const url = 'http://localhost:8080/q/poll';
     const data = {
-        eventId: /*[[${customer.eventId}]]*/ '',
-        customerId: /*[[${customer.customerId}]]*/ ''
+        eventId: /*[[${guest.eventId}]]*/ '',
+        customerId: /*[[${guest.customerId}]]*/ ''
     };
     const options = {
         method: 'POST',
@@ -25,22 +25,40 @@
         },
         body: JSON.stringify(data)
     };
-    function fetchWaitingNumber() {
-        fetch(url, options)
+    let loading = false;
+    async function fetchWaitingNumber() {
+        if (loading) {
+            return;
+        }
+        loading = true
+        let data = await fetch('http://localhost:8080/waiting/poll', options)
             .then(response => response.json())
-            .then(data => {
-                if (data?.result === 'ERROR') {
-                    alert("error " + data?.error?.message)
-                    clearInterval(intervalId)
-                    return
-                }
-                if (data.entryTicket) {
-                   let newUrl = '/e/test?entryTicket=' + data.entryTicket
-                    window.open(newUrl, "_top")
-                }
-                document.getElementById('position').innerText = 'position: ' + data.position
-                document.getElementById('entryTicket').innerText = 'entryTicket: ' + data.entryTicket
-            })
+            .then(result => result.data)
+            .catch(error => {
+                console.error('에러:', error)
+                alert("error " + error?.error?.message)
+                clearInterval(intervalId)
+            });
+        console.log(data)
+        if (data?.result === 'ERROR') {
+            alert("error " + data?.error?.message)
+            clearInterval(intervalId)
+            return
+        }
+        if (data.status === 'READY') {
+            alert("Your turn! entryTicket: " + data.ticketDetail.token + " redirectUrl: " + data.ticketDetail.redirectUrl)
+            window.open(data.ticketDetail.redirectUrl, "_top")
+        }
+        document.getElementById('position').innerText = 'position: ' + data.position
+        document.getElementById('size').innerText = 'size: ' + data.size
+        document.getElementById('estimatedWaitingTime').innerText = 'estimatedWaitingTime: ' + data.estimatedWaitingTime
+        loading = false
+    }
+
+    async function fetchTicket() {
+        return await fetch('http://localhost:8080/waiting/ticketDetail', options)
+            .then(response => response.json())
+            .then(result => result.data)
             .catch(error => {
                 console.error('에러:', error)
                 alert("error " + error?.error?.message)
