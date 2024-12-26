@@ -23,7 +23,7 @@ public class CustomerService {
         WaitingGuest waitingGuest = new WaitingGuest(eventId, customerId, WaitingStatus.WAITING);
         return waitingGuestRepository.save(waitingGuest)
                 .flatMap(Mono::just)
-                .doOnError(e -> log.error("Register error: " + e.getMessage()));
+                .doOnError(e -> log.error("Register error: {}", e.getMessage()));
     }
 
     public Mono<WaitingTicket> poll(String eventId, String customerId) {
@@ -40,13 +40,13 @@ public class CustomerService {
                                 .build()
                 ))
                 .switchIfEmpty(issueTicketIfReady(eventId, customerId))
-                .doOnError(e -> log.error("Polling error: " + e.getMessage()));
+                .doOnError(e -> log.error("Polling error: {}", e.getMessage()));
     }
 
     public Mono<WaitingTicket> issueTicketIfReady(String eventId, String customerId) {
         WaitingGuest waitingGuest = new WaitingGuest(eventId, customerId, WaitingStatus.READY);
         return isReady(waitingGuest)
-                .doOnNext(ready -> log.info("Customer ready status: " + ready))
+                .doOnNext(ready -> log.info("Customer ready status: {}", ready))
                 .flatMap(ready -> {
                     if (ready) {
                         return Mono.just(
@@ -90,11 +90,12 @@ public class CustomerService {
                 .flatMap(waitingGuest -> {
                         var readyGuest = waitingGuest.convertTo(WaitingStatus.READY);
                         return waitingGuestRepository.save(readyGuest)
-                                .flatMap(newQueueItem -> waitingGuestRepository.remove(waitingGuest))
+                                .flatMap(movedGuest -> waitingGuestRepository.remove(waitingGuest))
                                 .doOnNext(success -> log.info("Customer moved to entry queue: " + success));
                         }
                 )
                 .collectList()
+                .doOnNext(list -> log.info("Moved {} customers to entry queue", list.size()))
                 .onErrorResume(Mono::error);
     }
 }

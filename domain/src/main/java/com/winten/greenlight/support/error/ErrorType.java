@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorType {
 
     DEFAULT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.E500, "An unexpected error has occurred.", LogLevel.WARN),
-
+    EVENT_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "Event not found.", LogLevel.INFO),
     GUEST_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "Illegal access. Guest was not found in any level.", LogLevel.WARN),
     ;
 
