@@ -1,34 +1,32 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.0'
-    id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.springframework.boot' apply(false)
+    id 'io.spring.dependency-management'
 }
 
-bootJar.enabled = false
-jar.enabled = true
+allprojects {
+    group = "${projectGroup}"
+    version = "${applicationVersion}"
+    sourceCompatibility = project.javaVersion
 
-repositories {
-    mavenCentral()
+    repositories {
+        mavenCentral()
+    }
 }
 
-subprojects { // 모든 하위 모듈들에 이 설정을 적용합니다.
-    group 'com.winten'
-    version '0.0.1-SNAPSHOT'
-    sourceCompatibility = '17'
-
+subprojects {
     apply plugin: 'java'
     apply plugin: 'java-library'
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
 
+    bootJar.enabled = false
+    jar.enabled = true
+
     configurations {
         compileOnly {
             extendsFrom annotationProcessor
         }
-    }
-
-    repositories {
-        mavenCentral()
     }
 
     dependencies {

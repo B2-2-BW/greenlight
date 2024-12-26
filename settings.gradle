@@ -1,13 +1,15 @@
+pluginManagement {
+    plugins {
+        id 'org.springframework.boot' version "${springBootVersion}"
+        id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+    }
+}
 rootProject.name = 'greenlight'
-include 'storage'
+
 include 'core:core-api'
 include 'core:core-enum'
-findProject(':core:core-api')?.name = 'core-api'
-findProject(':core:core-enum')?.name = 'core-enum'
 include 'storage:db-core'
-findProject(':storage:db-core')?.name = 'db-core'
-include 'support'
 include 'support:logging'
-findProject(':support:logging')?.name = 'logging'
 include 'domain'
+include 'clients:client-admin'
 
