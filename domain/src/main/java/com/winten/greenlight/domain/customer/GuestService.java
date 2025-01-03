@@ -88,7 +88,7 @@ public class GuestService {
     public Mono<List<Boolean>> moveFirstNCustomerToEntryQueue(Integer count) {
         return guestRepository.findAll(WaitingStatus.WAITING.name(), count)
                 .flatMap(waitingGuest -> {
-                        var readyGuest = waitingGuest.convert(WaitingStatus.READY);
+                        var readyGuest = waitingGuest.updateStatus(WaitingStatus.READY);
                         return guestRepository.save(readyGuest)
                                 .flatMap(__ -> guestRepository.remove(waitingGuest))
                                 .doOnNext(success -> log.info("Customer moved to ready queue: {}", success));

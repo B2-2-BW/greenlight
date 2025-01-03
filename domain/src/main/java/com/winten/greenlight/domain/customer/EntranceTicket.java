@@ -5,8 +5,8 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 @Builder
-public record EntranceTicket(LocalDateTime issuedAt, String owner, String token, String redirectUrl) {
+public record EntranceTicket(String ticketId, LocalDateTime issuedAt, String redirectUrl) {
     public static EntranceTicket empty() {
-        return new EntranceTicket(null, "", "", "");
+        return new EntranceTicket("", null, "");
     }
 }

@@ -10,7 +10,7 @@ public record Guest(String eventId, String guestId, WaitingStatus status, double
         return String.format("%s:%s:%s", eventId, guestId, entryTime);
     }
 
-    public Guest convert(WaitingStatus status) {
+    public Guest updateStatus(WaitingStatus status) {
         return new Guest(eventId, guestId, status, entryTime);
     }
 }
