@@ -3,7 +3,7 @@ package com.winten.greenlight.domain.customer;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface GuestRepository {
+public interface QueueRepository {
     Mono<Guest> save(Guest guest);
 
     Mono<Boolean> remove(Guest guest);

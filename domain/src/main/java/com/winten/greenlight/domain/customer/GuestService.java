@@ -15,21 +15,25 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class GuestService {
+    private final AdminConfig adminConfig;
     private final TSIDGenerator tsidGenerator;
-    private final GuestRepository guestRepository;
+    private final QueueService queueService;
+    private final QueueRepository queueRepository;
 
-    public Mono<Guest> register(String eventId) {
-        String guestId = tsidGenerator.generate();
-        Guest guest = new Guest(eventId, guestId, WaitingStatus.WAITING);
-        return guestRepository.save(guest)
-                .flatMap(Mono::just)
-                .doOnError(e -> log.error("Register error: {}", e.getMessage()));
+    public Mono<Guest> register(String eventId, long entryTime) {
+        return Mono.just(adminConfig.eventUrl(eventId))
+                .switchIfEmpty(Mono.error(new CoreException(ErrorType.EVENT_NOT_FOUND)))
+                .flatMap(__ -> Mono.just(Guest.waiting(eventId, tsidGenerator.generate(), entryTime)))
+                .doOnNext(guest -> log.info("Guest created: {}", guest))
+                .flatMap(guest -> queueService.addToWaitingQueue(guest))
+                // .flatMap(queueService::addToWaitingQueue)
+                .doOnNext(guest -> log.info("Guest added to waiting queue: {}", guest));
     }
 
     public Mono<GuestStatus> poll(String eventId, String guestId) {
-        Guest guest = new Guest(eventId, guestId, WaitingStatus.WAITING);
-        return guestRepository.findRank(guest)
-                .zipWith(guestRepository.size(WaitingStatus.WAITING.name()))
+        return Mono.just(new Guest(eventId, guestId, WaitingStatus.WAITING))
+                .flatMap(guest -> queueRepository.findRank(guest))
+                .zipWith(queueRepository.size(WaitingStatus.WAITING.name()))
                 .flatMap(tuple -> Mono.just(
                         GuestStatus.builder()
                                 .status(WaitingStatus.WAITING)
@@ -66,7 +70,7 @@ public class GuestService {
 
     private Mono<Boolean> isReady(String eventId, String guestId) {
         Guest readyGuest = new Guest(eventId, guestId, WaitingStatus.READY);
-        return guestRepository.findRank(readyGuest)
+        return queueRepository.findRank(readyGuest)
                 .flatMap(rank -> Mono.just(true))
                 .switchIfEmpty(Mono.just(false));
     }
@@ -79,18 +83,18 @@ public class GuestService {
         String redirectUrl = "https://www.thehyundai.com/front/bda/BDALiveBrodViewer.thd?pLiveBfmtNo=202411130001";
         return EntranceTicket.builder()
                 .issuedAt(LocalDateTime.now())
-                .owner(guest.guestId())
-                .token(guest.tokenize())
-                .redirectUrl(redirectUrl)
+//                .owner(guest.guestId())
+//                .token(guest.tokenize())
+//                .redirectUrl(redirectUrl)
                 .build();
     }
 
     public Mono<List<Boolean>> moveFirstNCustomerToEntryQueue(Integer count) {
-        return guestRepository.findAll(WaitingStatus.WAITING.name(), count)
+        return queueRepository.findAll(WaitingStatus.WAITING.name(), count)
                 .flatMap(waitingGuest -> {
                         var readyGuest = waitingGuest.updateStatus(WaitingStatus.READY);
-                        return guestRepository.save(readyGuest)
-                                .flatMap(__ -> guestRepository.remove(waitingGuest))
+                        return queueRepository.save(readyGuest)
+                                .flatMap(__ -> queueRepository.remove(waitingGuest))
                                 .doOnNext(success -> log.info("Customer moved to ready queue: {}", success));
                         }
                 )

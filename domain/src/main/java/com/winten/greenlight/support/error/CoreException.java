@@ -1,6 +1,7 @@
 package com.winten.greenlight.support.error;
 
 import lombok.Getter;
+import reactor.core.publisher.Mono;
 
 @Getter
 public class CoreException extends RuntimeException {
@@ -23,6 +24,10 @@ public class CoreException extends RuntimeException {
 
     public static CoreException of(ErrorType errorType) {
         return new CoreException(errorType);
+    }
+
+    public static Mono<?> mono(ErrorType errorType) {
+        return Mono.error(new CoreException(errorType));
     }
 
 }

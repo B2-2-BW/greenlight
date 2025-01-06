@@ -22,11 +22,10 @@ public class EntryScheduler {
     public Disposable init() {
         return Flux.interval(Duration.ofSeconds(3))
                 .onBackpressureDrop()
-                .flatMap(i -> adminConfig.getBackPressure()
-                                .doOnNext(backPressure -> log.info("Scheduler running with backpressure {}", backPressure))
-                                .flatMap(queueService::moveFirstNCustomerToEntryQueue)
-                                .onErrorResume(Mono::error)
-                )
+                .flatMap(i -> Mono.just(adminConfig.getBackPressure()))
+                .doOnNext(backPressure -> log.info("Scheduler running with backpressure {}", backPressure))
+                .flatMap(queueService::moveFirstNCustomerToEntryQueue)
+                .onErrorResume(Mono::error)
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe();
     }

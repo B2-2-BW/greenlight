@@ -9,7 +9,7 @@ public class GuestEntity implements BaseZSetEntity {
     private String eventId;
     private String guestId;
     private WaitingStatus status;
-    private double entryTime;
+    private Double entryTime;
 
     @Override
     public String key() {
@@ -35,7 +35,10 @@ public class GuestEntity implements BaseZSetEntity {
     }
 
 
-    public static GuestEntity parse(String key, String value, double score) {
+    public static GuestEntity parse(String key, String value, Double score) {
+        assert key != null : "key is null";
+        assert value != null : "value is null";
+
         var parts = value.split(":");
         var eventId = parts[0];
         var guestId = parts[1];

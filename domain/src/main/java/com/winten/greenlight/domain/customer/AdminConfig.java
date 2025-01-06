@@ -9,21 +9,12 @@ import java.util.Map;
 @Service
 public class AdminConfig {
     @Cacheable("backPressure")
-    public Mono<Integer> getBackPressure() {
-        return Mono.just(1);
-    }
-
-    @Cacheable("eventUrlMap")
-    public Mono<Map<String, String>> eventUrlMap() {
-        Map<String, String> urlCache = Map.of(
-                "1", "https://www.thehyundai.com/front/bda/BDALiveBrodViewer.thd?pLiveBfmtNo=202411130001"
-        );
-        return Mono.just(urlCache);
+    public Integer getBackPressure() {
+        return 1;
     }
 
     @Cacheable("eventUrl")
-    public Mono<String> eventUrl(String eventId) {
-        return eventUrlMap()
-                .flatMap(map -> map.get(eventId) != null ? Mono.just(map.get(eventId)) : Mono.empty());
+    public String eventUrl(String eventId) {
+        return "https://www.thehyundai.com/front/bda/BDALiveBrodViewer.thd?pLiveBfmtNo=202411130001";
     }
 }
