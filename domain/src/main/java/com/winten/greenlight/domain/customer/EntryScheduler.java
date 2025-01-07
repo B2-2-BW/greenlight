@@ -16,7 +16,6 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class EntryScheduler {
     private final AdminConfig adminConfig;
-    private final GuestService queueService;
 
     @PostConstruct
     public Disposable init() {
@@ -24,7 +23,7 @@ public class EntryScheduler {
                 .onBackpressureDrop()
                 .flatMap(i -> Mono.just(adminConfig.getBackPressure()))
                 .doOnNext(backPressure -> log.info("Scheduler running with backpressure {}", backPressure))
-                .flatMap(queueService::moveFirstNCustomerToEntryQueue)
+//                .flatMap(queueService::moveFirstNCustomerToEntryQueue) //TODO implement scheduler logic
                 .onErrorResume(Mono::error)
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe();
