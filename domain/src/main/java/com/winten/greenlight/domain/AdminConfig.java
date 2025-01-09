@@ -12,9 +12,4 @@ public class AdminConfig {
     public Integer getBackPressure() {
         return 1;
     }
-
-    @Cacheable("eventUrl")
-    public String eventUrl(String eventId) {
-        return "https://www.thehyundai.com/front/bda/BDALiveBrodViewer.thd?pLiveBfmtNo=202411130001";
-    }
 }

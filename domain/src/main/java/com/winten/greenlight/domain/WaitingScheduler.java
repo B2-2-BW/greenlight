@@ -24,7 +24,7 @@ public class WaitingScheduler {
                 .onBackpressureDrop()
                 .flatMap(i -> Mono.just(adminConfig.getBackPressure()))
                 .doOnNext(backPressure -> log.info("Scheduler running with backpressure {}", backPressure))
-                .flatMap(waitingService::letWaitingComeIn) //TODO implement scheduler logic
+                .flatMap(waitingService::letWaitingComeIn)
                 .onErrorResume(Mono::error)
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe();

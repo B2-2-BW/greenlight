@@ -38,11 +38,6 @@ public class WaitingService {
         return rank; // TODO 예상 대기시간을 반환하는 비즈니스로직
     }
 
-    // TODO : event service를 만들고, event id로 event를 반환하는 로직 추가
-    private Mono<String> testFindEventByEventId(String eventId) {
-        return Mono.just("");
-    }
-
     public Mono<List<Boolean>> letWaitingComeIn(Integer count) {
         return waitingRepository.findAll(count)
                 .flatMap(waiting -> customerRepository.save(waiting.toCustomer())
