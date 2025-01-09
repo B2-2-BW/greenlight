@@ -1,4 +1,4 @@
-package com.winten.greenlight.domain.customer;
+package com.winten.greenlight.domain;
 
 public record Waiting(String eventId, String waitingId, double waitingScore) {
     public Customer toCustomer() {

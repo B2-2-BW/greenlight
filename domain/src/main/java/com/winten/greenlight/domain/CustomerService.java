@@ -1,4 +1,4 @@
-package com.winten.greenlight.domain.customer;
+package com.winten.greenlight.domain;
 
 import com.winten.greenlight.support.error.CoreException;
 import com.winten.greenlight.support.error.ErrorType;

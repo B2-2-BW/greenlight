@@ -1,4 +1,4 @@
-package com.winten.greenlight.domain.customer;
+package com.winten.greenlight.domain;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +14,9 @@ import java.time.Duration;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class EntryScheduler {
+public class WaitingScheduler {
     private final AdminConfig adminConfig;
+    private final WaitingService waitingService;
 
     @PostConstruct
     public Disposable init() {
@@ -23,7 +24,7 @@ public class EntryScheduler {
                 .onBackpressureDrop()
                 .flatMap(i -> Mono.just(adminConfig.getBackPressure()))
                 .doOnNext(backPressure -> log.info("Scheduler running with backpressure {}", backPressure))
-//                .flatMap(queueService::moveFirstNCustomerToEntryQueue) //TODO implement scheduler logic
+                .flatMap(waitingService::letWaitingComeIn) //TODO implement scheduler logic
                 .onErrorResume(Mono::error)
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe();

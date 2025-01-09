@@ -1,6 +1,6 @@
 package com.winten.greenlight.db.domain;
 
-import com.winten.greenlight.domain.customer.Waiting;
+import com.winten.greenlight.domain.Waiting;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.ZSetOperations;
 

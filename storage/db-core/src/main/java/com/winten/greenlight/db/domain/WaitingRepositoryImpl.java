@@ -1,7 +1,7 @@
 package com.winten.greenlight.db.domain;
 
-import com.winten.greenlight.domain.customer.Waiting;
-import com.winten.greenlight.domain.customer.WaitingRepository;
+import com.winten.greenlight.domain.Waiting;
+import com.winten.greenlight.domain.WaitingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Range;
@@ -17,13 +17,13 @@ public class WaitingRepositoryImpl implements WaitingRepository {
     private final ReactiveRedisTemplate<String, String> redisTemplate;
 
     @Override
-    public Mono<Waiting> save(Waiting guest) {
-        return Mono.just(WaitingZSetEntity.from(guest))
+    public Mono<Waiting> save(Waiting waiting) {
+        return Mono.just(WaitingZSetEntity.from(waiting))
                 .doOnNext(entity -> log.info("Joining queue: {}", entity))
                 .flatMap(entity -> redisTemplate.opsForZSet().add(entity.key(), entity.value(), entity.score()))
                 .flatMap(success -> {
                     if (Boolean.TRUE.equals(success)) {
-                        return Mono.just(guest);
+                        return Mono.just(waiting);
                     } else {
                         return Mono.error(new RuntimeException("Failed to add item to queue."));
                     }
@@ -31,16 +31,16 @@ public class WaitingRepositoryImpl implements WaitingRepository {
          ;
     }
 
-    public Mono<Boolean> remove(Waiting guest) {
-        return Mono.just(WaitingZSetEntity.from(guest))
-                .doOnNext(entity -> log.info("Removing guest: {}", entity))
+    public Mono<Boolean> remove(Waiting waiting) {
+        return Mono.just(WaitingZSetEntity.from(waiting))
+                .doOnNext(entity -> log.info("Removing waiting: {}", entity))
                 .flatMap(entity -> redisTemplate.opsForZSet().remove(entity.key(), entity.value()))
                 .map(removedCount -> removedCount > 0);
     }
 
-    public Mono<Long> findRank(Waiting guest) {
-        return Mono.just(WaitingZSetEntity.from(guest))
-                .doOnNext(entity -> log.info("Finding rank: {}", guest))
+    public Mono<Long> findRank(Waiting waiting) {
+        return Mono.just(WaitingZSetEntity.from(waiting))
+                .doOnNext(entity -> log.info("Finding rank: {}", waiting))
                 .flatMap(entity -> redisTemplate.opsForZSet().rank(entity.key(), entity.value()));
     }
 

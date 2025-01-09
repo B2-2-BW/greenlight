@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Queue Screen</title>
+</head>
+<body>
+<h1>Welcome to the Queue Screen!</h1>
+<p>eventId: <span th:text="${waiting.eventId}"></span></p>
+<p>waitingId: <span th:text="${waiting.waitingId}"></span></p>
+<p>waitingScore: <span th:text="${waiting.waitingScore}"></span></p>
+<p id="position">position: <span></span></p>
+<p id="totalSize">totalSize: <span></span></p>
+<p id="estimatedWaitingTime">estimatedWaitingTime: <span></span></p>
+
+</body>
+<script th:inline="javascript">
+    let loading = false;
+
+    const body = {
+        waitingId: /*[[${waiting.waitingId}]]*/ '',
+        eventId: /*[[${waiting.eventId}]]*/ ''
+    }
+
+
+    async function poll() {
+        if (loading) {
+            return;
+        }
+        loading = true
+        let waitingRes = await fetchWaiting()
+        if (!waitingRes.error) {
+            const waiting = waitingRes.data
+            console.log(waiting)
+            document.getElementById('position').innerText = 'position: ' + waiting.position
+            document.getElementById('totalSize').innerText = 'totalSize: ' + waiting.totalSize
+            document.getElementById('estimatedWaitingTime').innerText = 'estimatedWaitingTime: ' + waiting.estimatedWaitingTime
+        }
+        else {
+            let ticketRes = await fetchTicket()
+            console.log('ticket', ticketRes)
+            ticket = ticketRes?.data.ticket
+            clearInterval(intervalId)
+            alert("Your turn! redirectUrl: " + ticket.redirectUrl)
+            window.open(ticket.redirectUrl, "_top")
+        }
+        loading = false
+
+    }
+    async function fetchWaiting() {
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        };
+        return await fetch('http://localhost:8080/waiting/poll', options)
+            .then(response => response.json())
+            .catch(error => {
+                console.error('에러:', error)
+                alert("error " + error?.error?.message)
+                clearInterval(intervalId)
+            });
+    }
+    async function fetchTicket() {
+        const options = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+        return await fetch(`http://localhost:8080/customer/${body.waitingId}?eventId=${body.eventId}`, options)
+            .then(response => response.json())
+            .catch(error => {
+                console.error('에러 fetchTicket:', error)
+            });
+    }
+
+    let intervalId = setInterval(poll, 3000);
+
+    async function register() {
+
+    }
+</script>
+</html>

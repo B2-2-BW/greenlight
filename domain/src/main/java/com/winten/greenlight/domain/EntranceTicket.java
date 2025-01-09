@@ -1,4 +1,4 @@
-package com.winten.greenlight.domain.customer;
+package com.winten.greenlight.domain;
 
 import lombok.Builder;
 

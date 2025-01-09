@@ -1,11 +1,8 @@
 package com.winten.greenlight.db.domain;
 
-import com.winten.greenlight.domain.customer.Customer;
-import com.winten.greenlight.domain.customer.Waiting;
+import com.winten.greenlight.domain.Customer;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.ZSetOperations;
-
-import java.time.LocalDateTime;
 
 @AllArgsConstructor
 public class CustomerZSetEntity implements BaseZSetEntity {

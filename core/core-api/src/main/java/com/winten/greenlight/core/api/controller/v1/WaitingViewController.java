@@ -1,6 +1,6 @@
 package com.winten.greenlight.core.api.controller.v1;
 
-import com.winten.greenlight.domain.customer.WaitingService;
+import com.winten.greenlight.domain.WaitingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -22,8 +22,8 @@ public class WaitingViewController {
     public Mono<String> getWaitingView(@PathVariable String eventId, Model model) {
         long waitingScore = System.currentTimeMillis();
         return Mono.just(waitingService.register(eventId, waitingScore))
-                .doOnNext(guest -> model.addAttribute("guest", guest))
-                .flatMap(guest -> Mono.just("waitingScreen"))
+                .doOnNext(waiting -> model.addAttribute("waiting", waiting))
+                .flatMap(waiting -> Mono.just("waitingScreen"))
                 .switchIfEmpty(Mono.just("notFound")
                         .doOnNext(__ -> log.info("Event not found: {}", eventId)));
     }

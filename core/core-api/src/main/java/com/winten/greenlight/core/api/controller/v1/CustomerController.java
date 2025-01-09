@@ -2,7 +2,7 @@ package com.winten.greenlight.core.api.controller.v1;
 
 import com.winten.greenlight.core.api.controller.v1.response.CustomerResponseDto;
 import com.winten.greenlight.core.support.response.ApiResponse;
-import com.winten.greenlight.domain.customer.CustomerService;
+import com.winten.greenlight.domain.CustomerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
