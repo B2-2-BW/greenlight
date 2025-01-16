@@ -20,7 +20,7 @@ public class ExampleService {
                         if (result) {
                             return Mono.just(example);
                         }
-                        return Mono.error(new CoreException(ErrorType.DEFAULT_ERROR, "오류 발생"));
+                        return Mono.error(new CoreException(ErrorType.EXAMPLE_NOT_FOUND, "오류 발생"));
                 });
     }
 }

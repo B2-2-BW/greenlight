@@ -8,7 +8,7 @@ public class CoreException extends RuntimeException {
 
     private final ErrorType errorType;
 
-    private final Object data;
+    private final Object data; // 상세한 오류 내용
 
     public CoreException(ErrorType errorType) {
         super(errorType.getMessage());
