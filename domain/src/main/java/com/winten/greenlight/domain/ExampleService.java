@@ -15,12 +15,13 @@ public class ExampleService {
 
     public Mono<Example> saveExample(Example example) {
         return exampleRepository.save(example)
-                .doOnNext(result -> log.info("saved!"))
-                .flatMap(result -> {
-                        if (result) {
-                            return Mono.just(example);
-                        }
-                        return Mono.error(new CoreException(ErrorType.EXAMPLE_NOT_FOUND, "오류 발생"));
-                });
+            .doOnNext(result -> log.info("saved!"))
+            .flatMap(result -> {
+                if (result) {
+                    return Mono.just(example);
+                } else {
+                    return Mono.error(new CoreException(ErrorType.EXAMPLE_NOT_FOUND, "오류 발생"));
+                }
+            });
     }
 }
