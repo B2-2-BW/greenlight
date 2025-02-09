@@ -26,7 +26,7 @@ public class MemberController {
             .map(ApiResponse::success);
     }
     //http://localhost:8080/member/queue?memberId=0JENEC2Y643A7
-    //{"result":"SUCCESS","data":{"queueNumber":0,"remainingMembers":1,"estimatedWaitTime":2},"error":null}
+    //{"result":"SUCCESS","data":{"queueNumber":-1,"remainingMembers":274,"estimatedWaitTime":548},"error":null}
 }
 
 

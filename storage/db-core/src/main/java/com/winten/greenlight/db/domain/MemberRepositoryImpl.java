@@ -13,7 +13,6 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class MemberRepositoryImpl implements MemberRepository {
     private final ReactiveRedisTemplate<String, String> redisTemplate;
-    private static final String QUEUE_KEY = "queue:customer"; // Redis에서 대기열 키
 
     //대기순번 조회
     @Override

@@ -12,16 +12,16 @@ public class MemberZSetEntity implements BaseZSetEntity {
 
     @Override
     public String key() {
-        return "";
+        return "queue:customer";
     }
 
     @Override
     public String value() {
-        return "";
+        return customer.eventId() + ":" + customer.customerId();
     }
 
     @Override
     public double score() {
-        return 0;
+        return customer.waitingScore();
     }
 }
