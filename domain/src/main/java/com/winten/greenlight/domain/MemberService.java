@@ -12,10 +12,10 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     // 대기 정보 조회
-    public Mono<MemberQueueResponse> getMemberQueueInfo(String memberId) {
+    public Mono<MemberQueueResponse> getMemberQueueInfo(Customer customer) {
         // 대기순번과 대기 인원 수를 조회
-        return memberRepository.getMemberQueuePosition(memberId)
-            .flatMap(position -> memberRepository.getTotalWaitingCount()
+        return memberRepository.getMemberQueuePosition(customer)
+            .flatMap(position -> memberRepository.getTotalWaitingCount(customer)
                 .map(total -> new MemberQueueResponse(position, total - position, estimateWaitTime(total - position)))
             );
     }
