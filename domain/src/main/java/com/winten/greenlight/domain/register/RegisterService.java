@@ -14,19 +14,23 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class RegisterService {
     private final RegisterRepository registerRepository;
-    //질문1 여기에서 redis에 저장하는 등의 로직 처리 필요 ex saveTicket 생성 후 repository에서 저장 하는 등
 
     public Mono<Customer> getTicket(String eventId) {
         return registerRepository.generateTicket()
-            .doOnNext(result -> log.info("saved!"))
-            .map(result -> new Customer(eventId, result.customerId(), result.waitingScore(), WaitingStatus.WAITING)) // eventId 변경
-            .flatMap(result -> {
-                if (result.customerId() != null && result.waitingStatus() != null) {
-                    return Mono.just(result); //TODO 성공 메시지 등으로 반환 필요 및 레디스 내 저장기능 생성
-                } else {
-                    return Mono.error(new CoreException(ErrorType.EXAMPLE_NOT_FOUND, "오류 발생")); //TODO Error Type 정의 필요(충돌방지 작업 x)
-                }
+            .doOnNext(result -> log.info("Ticket generated: {}", result))
+            .map(result -> new Customer(eventId, result.customerId(), result.waitingScore(), WaitingStatus.WAITING))
+            .flatMap(this::saveTicket)
+            .doOnSuccess(customer -> log.info("Ticket saved: {}", customer))
+            .switchIfEmpty(Mono.error(new CoreException(ErrorType.EXAMPLE_NOT_FOUND, "Ticket generation failed")))
+            .onErrorResume(e -> {
+                log.error("Error occurred while generating ticket", e);
+                return Mono.error(new CoreException(ErrorType.EXAMPLE_NOT_FOUND, "오류 발생"));
             });
     }
 
+    public Mono<Customer> saveTicket(Customer customer) {
+        return registerRepository.saveTicket(customer)
+            .doOnSuccess(saved -> log.info("Successfully saved ticket for customer: {}", saved))
+            .doOnError(e -> log.error("Failed to save ticket", e));
+    }
 }

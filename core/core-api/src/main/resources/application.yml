@@ -6,7 +6,6 @@ spring:
     import:
       - storage.yml
       - logging.yml
-      - client-admin.yml
 
   web.resources.add-mappings: false
 
