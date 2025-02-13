@@ -1,26 +1,35 @@
 package com.winten.greenlight.db.domain;
 
 import com.winten.greenlight.domain.Customer;
+import com.winten.greenlight.domain.WaitingStatus;
+import lombok.Setter;
 
 public class CustomerZSetEntity implements BaseZSetEntity {
-    Customer customer;
+    private final String eventId;
+    private final String customerId;
+    private final double waitingScore;
+    @Setter
+    private WaitingStatus waitingStatus;
 
     public CustomerZSetEntity(Customer customer) {
-        this.customer = customer;
+        this.eventId = customer.eventId();
+        this.customerId = customer.customerId();
+        this.waitingScore = customer.waitingScore();
+        this.waitingStatus = customer.waitingStatus();
     }
 
     @Override
     public String key() {
-        return "queue:customer";
+        return waitingStatus.queueName();
     }
 
     @Override
     public String value() {
-        return customer.eventId() + ":" + customer.customerId();
+        return eventId + ":" + customerId;
     }
 
     @Override
     public double score() {
-        return customer.waitingScore();
+        return waitingScore;
     }
 }
