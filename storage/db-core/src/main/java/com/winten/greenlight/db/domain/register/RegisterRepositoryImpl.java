@@ -1,6 +1,7 @@
 package com.winten.greenlight.db.domain.register;
 
 import com.github.f4b6a3.tsid.TsidCreator;
+import com.winten.greenlight.db.domain.CustomerZSetEntity;
 import com.winten.greenlight.domain.Customer;
 import com.winten.greenlight.domain.register.RegisterRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class RegisterRepositoryImpl implements RegisterRepository {
 
     @Override
     public Mono<Customer> saveTicket(Customer customer) {
-        return Mono.just(new TempZSetEntity(customer))
+        return Mono.just(new CustomerZSetEntity(customer))
             .doOnNext(entity -> log.info("Saving: {}", entity))
             .flatMap(entity -> redisTemplate.opsForZSet().add(entity.key(), entity.value(), entity.score())
                 .thenReturn(customer))
