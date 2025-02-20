@@ -12,12 +12,17 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     // 대기 정보 조회
+    // 대기 정보 조회
     public Mono<MemberQueueResponse> getMemberQueueInfo(Customer customer) {
-        // 대기순번과 대기 인원 수를 조회
         return memberRepository.getMemberQueuePosition(customer)
-            .flatMap(position -> memberRepository.getTotalWaitingCount(customer)
-                .map(total -> new MemberQueueResponse(position, total - position, estimateWaitTime(total - position)))
-            );
+            .zipWith(memberRepository.getTotalWaitingCount(customer))
+            .map(tuple -> { //결과를 tuple로 묶어 하나의 Mono로 반환.
+                int position = tuple.getT1();
+                int total = tuple.getT2();
+                int remaining = total - position;
+                int estimatedTime = estimateWaitTime(remaining);
+                return new MemberQueueResponse(position, remaining, estimatedTime);
+            });
     }
 
     // 예상 대기시간 계산 (1명당 2분 예상)
@@ -25,7 +30,3 @@ public class MemberService {
         return remainingMembers * 2; // 1명당 2분 대기 예상
     }
 }
-
-
-
-

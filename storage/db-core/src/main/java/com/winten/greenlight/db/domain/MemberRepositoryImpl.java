@@ -14,27 +14,28 @@ import reactor.core.publisher.Mono;
 public class MemberRepositoryImpl implements MemberRepository {
     private final ReactiveRedisTemplate<String, String> redisTemplate;
 
-    //대기순번 조회
+    // 대기순번 조회
     @Override
     public Mono<Integer> getMemberQueuePosition(Customer customer) {
-        return Mono.just(new MemberZSetEntity(customer))  // Customer 객체로 ZSet 엔티티 생성
-            .flatMap(entity -> redisTemplate.opsForZSet().rank(entity.key(), entity.value()))
-            .map(Long::intValue)  // rank() 메서드는 Long 타입이므로 int로 변환
-            .defaultIfEmpty(-1);  // 대기열에 없으면 -1 반환
+//        Mono.defer() 사용:
+//        지연 실행으로 필요할 때 Mono가 생성됨.
+//        MemberZSetEntity를 실행 시점에 생성해 더 나은 메모리 관리.
+        return Mono.defer(() -> {
+            MemberZSetEntity entity = new MemberZSetEntity(customer);
+            return redisTemplate.opsForZSet().rank(entity.key(), entity.value())
+                .map(Long::intValue)
+                .defaultIfEmpty(-1);
+        });
     }
 
     // 전체 대기자 수 조회
     @Override
     public Mono<Integer> getTotalWaitingCount(Customer customer) {
-        return Mono.just(new MemberZSetEntity(customer))  // 임시 Customer 객체로 ZSet 엔티티 생성
-            .flatMap(entity -> redisTemplate.opsForZSet().size(entity.key()))  // 대기열의 크기 조회
-            .map(Long::intValue)  // 전체 대기 인원 수를 int로 변환
-            .defaultIfEmpty(0);  // 대기열에 아무도 없으면 0 반환
+        return Mono.defer(() -> {
+            MemberZSetEntity entity = new MemberZSetEntity(customer);
+            return redisTemplate.opsForZSet().size(entity.key())
+                .map(Long::intValue)
+                .defaultIfEmpty(0);
+        });
     }
 }
-
-
-
-
-
-
