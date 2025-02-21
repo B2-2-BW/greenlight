@@ -15,11 +15,11 @@ import reactor.core.publisher.Mono;
 public class RegisterService {
     private final RegisterRepository registerRepository;
 
-    public Mono<Customer> getTicket(String eventId) {
+    public Mono<Customer> generateCustomer(String eventId) {
         return registerRepository.generateTicket()
             .doOnNext(result -> log.info("Ticket generated: {}", result))
             .map(result -> new Customer(eventId, result.customerId(), result.waitingScore(), WaitingStatus.WAITING))
-            .flatMap(this::saveTicket)
+            .flatMap(this::enrollCustomer)
             .doOnSuccess(customer -> log.info("Ticket saved: {}", customer))
             .switchIfEmpty(Mono.error(new CoreException(ErrorType.EXAMPLE_NOT_FOUND, "Ticket generation failed")))
             .onErrorResume(e -> {
@@ -28,8 +28,8 @@ public class RegisterService {
             });
     }
 
-    public Mono<Customer> saveTicket(Customer customer) {
-        return registerRepository.saveTicket(customer)
+    public Mono<Customer> enrollCustomer(Customer customer) {
+        return registerRepository.enrollCustomer(customer)
             .doOnSuccess(saved -> log.info("Successfully saved ticket for customer: {}", saved))
             .doOnError(e -> log.error("Failed to save ticket", e));
     }

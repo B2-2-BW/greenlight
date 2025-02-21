@@ -8,5 +8,5 @@ public interface RegisterRepository {
     Mono<Customer> generateTicket();
 
     /* 사용자의 입장 티켓을 저장해주는 메서드 */
-    Mono<Customer> saveTicket(Customer customer);
+    Mono<Customer> enrollCustomer(Customer customer);
 }

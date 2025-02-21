@@ -1,4 +1,4 @@
-package com.winten.greenlight.core.api.controller;
+package com.winten.greenlight.core.api.controller.v1;
 
 import com.winten.greenlight.core.api.controller.v1.request.RegisterRequestDto;
 import com.winten.greenlight.core.api.controller.v1.response.RegisterResponseDto;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/events")
+@RequestMapping("v1/customer")
 public class RegisterController {
     private final RegisterService registerService;
 
@@ -19,7 +19,7 @@ public class RegisterController {
 
     @PostMapping("/register")
     public Mono<ApiResponse<RegisterResponseDto>> register(@RequestBody RegisterRequestDto requestDto) {
-        return registerService.getTicket(requestDto.eventId())
+        return registerService.generateCustomer(requestDto.eventId())
             .map(customer -> ApiResponse.success(new RegisterResponseDto("SUCCESS")));
     }
 }

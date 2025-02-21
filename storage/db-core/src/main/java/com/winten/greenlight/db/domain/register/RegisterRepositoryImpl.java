@@ -27,7 +27,7 @@ public class RegisterRepositoryImpl implements RegisterRepository {
     }
 
     @Override
-    public Mono<Customer> saveTicket(Customer customer) {
+    public Mono<Customer> enrollCustomer(Customer customer) {
         return Mono.just(new CustomerZSetEntity(customer))
             .doOnNext(entity -> log.info("Saving: {}", entity))
             .flatMap(entity -> redisTemplate.opsForZSet().add(entity.key(), entity.value(), entity.score())
