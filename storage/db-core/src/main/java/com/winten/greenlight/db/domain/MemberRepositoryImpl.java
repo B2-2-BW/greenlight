@@ -24,7 +24,7 @@ public class MemberRepositoryImpl implements MemberRepository {
             MemberZSetEntity entity = new MemberZSetEntity(customer);
             return redisTemplate.opsForZSet().rank(entity.key(), entity.value())
                 .map(Long::intValue)
-                .defaultIfEmpty(-1);
+                .defaultIfEmpty(0);
         });
     }
 
