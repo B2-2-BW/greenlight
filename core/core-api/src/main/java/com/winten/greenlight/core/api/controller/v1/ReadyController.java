@@ -35,11 +35,8 @@ public class ReadyController {
     public Mono<Boolean> isReady(@PathVariable String eventId, @PathVariable String customerId) { //접속 여부 확인
         // 현재는 api의 통합 이전 단계이기 때문에 임의로 new Customer record 생성자 호출시에
         // 강제로 WatingStatus.READY 로 하드코딩함(무조건 queue:ready 테이블을 조회하기 위해)
-        System.out.println("eventId = " + eventId);
-        System.out.println("customerId = " + customerId);
-        log.info("isReady({}, {})", eventId, customerId);
         return readyService.isReady(new Customer(eventId, customerId, -1, WaitingStatus.READY))
-            .doOnNext(result -> log.info("isReady({}, {}, {})", eventId, customerId, result));
+            .doOnNext(result -> log.info("################isReady({}, {}, {})", eventId, customerId, result));
     }
 
 }
