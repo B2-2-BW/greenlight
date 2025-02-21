@@ -2,6 +2,7 @@ package com.winten.greenlight.db.domain;
 
 import com.winten.greenlight.domain.Customer;
 import com.winten.greenlight.domain.CustomerWaitingRepository;
+import com.winten.greenlight.domain.WaitingStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
@@ -17,7 +18,7 @@ public class CustomerWaitingRepositoryImpl implements CustomerWaitingRepository 
     //고객 조회
     @Override
     public Mono<Customer> findById(String eventId, String customerId) {
-        return Mono.just(CustomerZSetEntity.from(new Customer(eventId, customerId, 0.0, null, null)))
+        return Mono.just(new CustomerZSetEntity(new Customer(eventId, customerId, 0.0, null, null)))
                 .doOnNext(entity -> log.info("Finding rank: {}", entity.score()))
                 .flatMap(entity -> redisTemplate.opsForZSet().rank(entity.key(), entity.value()))
                 .map(rank -> new Customer(eventId, customerId, rank, null, null));
@@ -26,7 +27,7 @@ public class CustomerWaitingRepositoryImpl implements CustomerWaitingRepository 
     //고객 이탈(삭제)
     @Override
     public Mono<Boolean> deleteById(String eventId, String customerId) {
-        return Mono.just(CustomerZSetEntity.from(new Customer(eventId, customerId, 0.0, null, null)))
+        return Mono.just(new CustomerZSetEntity(new Customer(eventId, customerId, 0.0, WaitingStatus.WAITING, null)))
                 .flatMap(entity -> {
                     return redisTemplate.opsForZSet().remove(entity.key(), entity.value())
                             .flatMap(removedCount -> {
