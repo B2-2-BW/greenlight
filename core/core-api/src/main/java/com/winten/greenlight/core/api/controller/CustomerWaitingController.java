@@ -17,16 +17,6 @@ import reactor.core.publisher.Mono;
 public class CustomerWaitingController {
     private final CustomerWaitingService customerWaitingService;
 
-    //고객 조회
-    @PostMapping("/")
-    public Mono<ApiResponse<CustomerWaitingResponseDto>> selectCustomer(@RequestBody Customer customer) {
-        return customerWaitingService.getCustomer(customer.eventId(), customer.customerId())
-            .flatMap(customerVO -> {
-                CustomerWaitingResponseDto customerWaitingResponseDto = new CustomerWaitingResponseDto(customerVO.eventId(), customerVO.customerId(), customerVO.waitingScore(), customerVO.accessTicket());
-                return Mono.just(ApiResponse.success(customerWaitingResponseDto));
-            });
-    }
-
     //고객 이탈(삭제)
     @PostMapping("/delete")
     public Mono<ApiResponse> deleteCustomer(@RequestBody Customer customer) {
