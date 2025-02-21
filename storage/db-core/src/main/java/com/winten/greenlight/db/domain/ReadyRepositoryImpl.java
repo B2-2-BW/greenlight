@@ -21,10 +21,10 @@ public class ReadyRepositoryImpl implements ReadyRepository {
             .flatMap(entity -> redisTemplate.opsForZSet().rank(entity.key(), entity.value()))
             .doOnNext(rank -> log.info("currentRank: {}", rank))
             .flatMap(rank -> {
-                if (rank == 0L) { //rank가 0이 아니라, 이미 0값이 되어서 enum 으로 status값을 먼저 조작한다면, rank 가 아닌 status를 가져오는 방식으로 구현해야 할 수도 있음
-                    return Mono.just(Boolean.TRUE);
-                } else {
+                if (rank == null) { //rank가 0이 아니라, 이미 0값이 되어서 enum 으로 status값을 먼저 조작한다면, rank 가 아닌 status를 가져오는 방식으로 구현해야 할 수도 있음
                     return Mono.just(Boolean.FALSE);
+                } else {
+                    return Mono.just(Boolean.TRUE);
                 }
             });
     }
