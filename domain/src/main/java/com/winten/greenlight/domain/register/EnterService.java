@@ -12,11 +12,11 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class RegisterService {
-    private final RegisterRepository registerRepository;
+public class EnterService {
+    private final EnterRepository enterRepository;
 
-    public Mono<Customer> generateCustomer(String eventId, Double waitingScore) throws CoreException {
-        return registerRepository.generateTicket(waitingScore)
+    public Mono<Customer> enterCustomer(String eventId, Double waitingScore) throws CoreException {
+        return enterRepository.generateTicket(waitingScore)
             .doOnNext(result -> log.info("Ticket generated: {}", result))
             .map(result -> new Customer(eventId, result.customerId(), result.waitingScore(), WaitingStatus.WAITING, null))
             .flatMap(this::enrollCustomer)
@@ -29,7 +29,7 @@ public class RegisterService {
     }
 
     public Mono<Customer> enrollCustomer(Customer customer) {
-        return registerRepository.enrollCustomer(customer)
+        return enterRepository.enrollCustomer(customer)
             .doOnSuccess(saved -> log.info("Successfully saved ticket for customer: {}", saved))
             .doOnError(e -> log.error("Failed to save ticket", e));
     }
