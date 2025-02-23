@@ -15,10 +15,10 @@ import reactor.core.publisher.Mono;
 public class RegisterService {
     private final RegisterRepository registerRepository;
 
-    public Mono<Customer> generateCustomer(String eventId) {
-        return registerRepository.generateTicket()
+    public Mono<Customer> generateCustomer(String eventId, Double waitingScore) throws CoreException {
+        return registerRepository.generateTicket(waitingScore)
             .doOnNext(result -> log.info("Ticket generated: {}", result))
-            .map(result -> new Customer(eventId, result.customerId(), result.waitingScore(), WaitingStatus.WAITING))
+            .map(result -> new Customer(eventId, result.customerId(), result.waitingScore(), WaitingStatus.WAITING, null))
             .flatMap(this::enrollCustomer)
             .doOnSuccess(customer -> log.info("Ticket saved: {}", customer))
             .switchIfEmpty(Mono.error(new CoreException(ErrorType.EXAMPLE_NOT_FOUND, "Ticket generation failed")))

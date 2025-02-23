@@ -19,7 +19,12 @@ public class RegisterController {
 
     @PostMapping("/register")
     public Mono<ApiResponse<RegisterResponseDto>> register(@RequestBody RegisterRequestDto requestDto) {
-        return registerService.generateCustomer(requestDto.eventId())
+        RegisterRequestDto updatedRequestDto = new RegisterRequestDto(
+            requestDto.eventId(),
+            System.currentTimeMillis() // 새로운 대기 점수
+        );
+
+        return registerService.generateCustomer(updatedRequestDto.eventId(), updatedRequestDto.waitingScore())
             .map(customer -> ApiResponse.success(new RegisterResponseDto("SUCCESS")));
     }
 }

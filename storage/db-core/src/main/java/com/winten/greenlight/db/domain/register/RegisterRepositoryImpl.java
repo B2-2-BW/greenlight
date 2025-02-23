@@ -17,12 +17,11 @@ public class RegisterRepositoryImpl implements RegisterRepository {
     private final ReactiveRedisTemplate<String, String> redisTemplate;
 
     @Override
-    public Mono<Customer> generateTicket() {    //Entity 충돌방지를 위해 domain의 Object 임시로 사용
+    public Mono<Customer> generateTicket(Double waitingScore) {    //Entity 충돌방지를 위해 domain의 Object 임시로 사용
         return Mono.fromCallable(() -> {
             String customerId = TsidCreator.getTsid().toString(); // 고객 ID 생성
-            double waitingScore = System.currentTimeMillis(); // 대기 점수
 
-            return new Customer(null, customerId, waitingScore, null);
+            return new Customer(null, customerId, waitingScore, null, null);
         }).doOnSuccess(ticket -> log.info("Generated ticket: {}", ticket));
     }
 
